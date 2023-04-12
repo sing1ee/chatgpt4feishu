@@ -92,7 +92,7 @@ def callback_event_handler():
 def gpt(key):
     if key.startswith('group'):
         # load the latest msg
-        msg = json.loads(get_user_msg_by_key(key, 0, 1))
+        msg = json.loads(get_user_msg_by_key(key, 0, 1)[0])
         if not is_replied(key, msg.event.message.message_id):
             print(json.dumps(msg.event.message))
             # content = chat_completion(kwargs = {
