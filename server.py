@@ -12,7 +12,7 @@ from event import MessageReceiveEvent, UrlVerificationEvent, MessageReadEvent, E
 from flask import Flask, jsonify
 from openai_client import chat_completion
 from redis_client import push_user_msg, users, get_user_msg_by_key, replied, is_replied
-from utils import obj2dict
+from utils import obj2dict, dict2obj
 
 from concurrent.futures import ThreadPoolExecutor
 import threading
@@ -92,7 +92,7 @@ def callback_event_handler():
 def gpt(key):
     if key.startswith('group'):
         # load the latest msg
-        msg = json.loads(get_user_msg_by_key(key, 0, 1)[0])
+        msg = dict2obj(json.loads(get_user_msg_by_key(key, 0, 1)[0]))
         if not is_replied(key, msg.event.message.message_id):
             print(json.dumps(msg.event.message))
             # content = chat_completion(kwargs = {
