@@ -54,7 +54,7 @@ def message_receive_event_handler(req_data: MessageReceiveEvent):
     # ou_3f08bfcc9b16f3146507814b9ea5245c
     if message.chat_type == 'group':
         if message.mentions:
-            for m in message.metions:
+            for m in message.mentions:
                 if m.id.open_id == 'ou_3f08bfcc9b16f3146507814b9ea5245c':
                     push_user_msg(message.chat_id, sender_id.open_id, message.chat_type, msg)
                     break
