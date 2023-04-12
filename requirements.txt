@@ -3,3 +3,4 @@ requests
 pycryptodome
 openai
 Flask
+redis

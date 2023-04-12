@@ -6,9 +6,15 @@ chatgpt robot for feishu
 docker build -t feishu-robot .
 ```
 
+### docker network
+```shell
+docker network create cc
+```
+
 ### Run
 ```shell
-docker run --rm --env-file .env -v /your_code_folder:/home/app -p 6543:3456  -it feishu-robot server.py
+
+docker run --rm --env-file .env -v /your_code_folder:/home/app -p 6543:3456 --network cc  -it feishu-robot server.py
 ```
 
 ### Nginx 
@@ -29,8 +35,24 @@ docker run --rm --env-file .env -v /your_code_folder:/home/app -p 6543:3456  -it
  https://your_domain.com/feishurobot
 ```
 
-### Gen requirements.txt
+### redis
 ```shell
-1. pip install pipreqs
-2. pipreqs --use-local ./
+
+docker run --name chat-redis --network cc -v /data/workspace/chat-redis-data/redis.conf:/etc/redis/redis.conf -v /data/workspace/chat-redis-data:/data -d redis redis-server /etc/redis/redis.conf
+
+
+
+docker run -it --network cc --rm redis redis-cli -h chat-redis
 ```
+
+### Message Queue
+1. 有两个队列来存消息 chat_id_open_id_assistant 和 chat_id_open_id_user
+- chat_id_open_id_assistant 私聊，或者群聊中，机器人回复某一用户
+- chat_id_open_id_user 私聊，或者群聊中，用户说的话，在群聊中，包含 @机器人
+2. chat_id_open_id_user 用户的消息保存在队列中。
+3. 异步线程，处理 chat_id_open_id_user
+- 当通过chatgpt获取到最新的回复，chat_id_open_id_user中没有新的消息，则私聊直接回复，群聊回复消息，然后机器人消息进入 chat_id_open_id_assistant
+- 当通过chatgpt获取到最新的回复，chat_id_open_id_user中有新的消息，则私聊回复消息，群聊回复消息，然后机器人消息进入 chat_id_open_id_assistant
+4. 调用chatgpt逻辑
+- 获取历史的message，根据当前要回复的消息，找到这个消息以及之前的n条消息，包括 chat_id_open_id_assistant 和 chat_id_open_id_user，合并发给chatgpt。
+- 如果通过prompt调整，则在这里处理。

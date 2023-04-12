@@ -9,7 +9,9 @@ import requests
 from api import MessageApiClient
 from event import MessageReceiveEvent, UrlVerificationEvent, MessageReadEvent, EventManager
 from flask import Flask, jsonify
+from redis_client import push_user_msg
 from utils import obj2dict
+
 
 # load env parameters form file named .env
 
@@ -43,14 +45,14 @@ def request_read_handler(req_data: MessageReadEvent):
 def message_receive_event_handler(req_data: MessageReceiveEvent):
     sender_id = req_data.event.sender.sender_id
     message = req_data.event.message
-    print(json.dumps(obj2dict(req_data)))
+    msg = json.dumps(obj2dict(req_data))
+    print(msg)
     if message.message_type != "text":
         logging.warning("Other types of messages have not been processed yet")
         return jsonify()
         # get open_id and text_content
-    text_content = message.content
+    push_user_msg(message.chat_id, sender_id.open_id, msg)
     # echo text message
-    print(text_content)
     if message.chat_type == 'group':
         message_api_client.send('chat_id', message.chat_id, 'text', json.dumps({'text':'echo'}))
     return jsonify()
