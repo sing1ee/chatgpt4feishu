@@ -97,7 +97,7 @@ def gpt(key):
             print(json.dumps(obj2dict(msg.event.message)))
             txt = json.loads(msg.event.message.content)['text']
             for m in msg.event.message.mentions:
-                txt.replace(m.key, ' ')
+                txt = txt.replace(m.key, ' ')
             print(txt)
             # content = chat_completion(kwargs = {
             #     "model": "gpt-3.5-turbo",
