@@ -95,6 +95,10 @@ def gpt(key):
         msg = dict2obj(json.loads(get_user_msg_by_key(key, 0, 1)[0]))
         if not is_replied(key, msg.event.message.message_id):
             print(json.dumps(obj2dict(msg.event.message)))
+            txt = json.loads(msg.event.message.content.text).text
+            for m in msg.event.message.mentions:
+                txt.replace(m.key, ' ')
+            print(txt)
             # content = chat_completion(kwargs = {
             #     "model": "gpt-3.5-turbo",
             #     "messages": [
