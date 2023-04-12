@@ -94,7 +94,7 @@ def gpt(key):
         # load the latest msg
         msg = dict2obj(json.loads(get_user_msg_by_key(key, 0, 1)[0]))
         if not is_replied(key, msg.event.message.message_id):
-            print(json.dumps(msg.event.message))
+            print(json.dumps(obj2dict(msg.event.message)))
             # content = chat_completion(kwargs = {
             #     "model": "gpt-3.5-turbo",
             #     "messages": [
