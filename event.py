@@ -99,7 +99,8 @@ class EventManager(object):
         # only handle event v2
         schema = dict_data.get("schema")
         if schema is None:
-            raise InvalidEventException("request is not callback event(v2)")
+            print("request is not callback event(v2)", json.dumps(dict_data))
+            return None, None
 
         # get event_type
         event_type = dict_data.get("header").get("event_type")
