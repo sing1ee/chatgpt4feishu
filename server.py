@@ -48,11 +48,11 @@ def message_receive_event_handler(req_data: MessageReceiveEvent):
         logging.warning("Other types of messages have not been processed yet")
         return jsonify()
         # get open_id and text_content
-    open_id = sender_id.open_id
     text_content = message.content
     # echo text message
     print(text_content)
-    message_api_client.send_text_with_open_id(open_id, text_content)
+    if message.chat_type == 'group':
+        message_api_client.send('chat_id', message.chat_id, 'text', json.dumps({'text':'echo'}))
     return jsonify()
 
 
