@@ -95,3 +95,9 @@ class LarkException(Exception):
         return "{}:{}".format(self.code, self.msg)
 
     __repr__ = __str__
+
+# load from env
+LARK_HOST = os.getenv("LARK_HOST")
+
+# init service
+message_api_client = MessageApiClient(APP_ID, APP_SECRET, LARK_HOST)

@@ -6,16 +6,12 @@ import json
 import os
 import logging
 import requests
-import time
-from api import MessageApiClient
 from event import MessageReceiveEvent, UrlVerificationEvent, MessageReadEvent, EventManager
 from flask import Flask, jsonify
-from openai_client import chat_completion
-from redis_client import push_user_msg, users, get_user_msg_by_key, replied, is_replied
-from utils import obj2dict, dict2obj
+from redis_client import push_user_msg
+from utils import obj2dict
 
-from concurrent.futures import ThreadPoolExecutor
-import threading
+
 
 
 # load env parameters form file named .env
@@ -24,14 +20,10 @@ import threading
 app = Flask(__name__)
 
 # load from env
-APP_ID = os.getenv("APP_ID")
-APP_SECRET = os.getenv("APP_SECRET")
 VERIFICATION_TOKEN = os.getenv("VERIFICATION_TOKEN")
 ENCRYPT_KEY = os.getenv("ENCRYPT_KEY")
-LARK_HOST = os.getenv("LARK_HOST")
 
 # init service
-message_api_client = MessageApiClient(APP_ID, APP_SECRET, LARK_HOST)
 event_manager = EventManager()
 
 @event_manager.register("url_verification")
@@ -87,52 +79,5 @@ def callback_event_handler():
         return jsonify()
     return event_handler(event)
 
-
-def gpt(key):
-    print('%s %s' % (key, threading.current_thread().name))
-    if key.startswith('group'):
-        # load the latest msg
-        msg = dict2obj(json.loads(get_user_msg_by_key(key, 0, 1)[0]))
-        if not is_replied(key, msg.event.message.message_id):
-            # print(json.dumps(obj2dict(msg.event.message)))
-            txt = json.loads(msg.event.message.content)['text']
-            for m in msg.event.message.mentions:
-                txt = txt.replace(m.key, ' ')
-            
-            kwargs = {
-                "model": "gpt-3.5-turbo",
-                "messages": [
-                    {
-                    "role": "user",
-                    "content": txt
-                    }
-                ],
-                "max_tokens": 1000,
-                "temperature": 0.0
-            }
-            content = chat_completion(**kwargs)
-            message_api_client.reply(msg.event.message.message_id, 'text', json.dumps({'text':content}))
-            replied(key, msg.event.message.message_id)
-            pass
-    return '%s %s' % (key, threading.current_thread().name)
-
-class LoopWorker (threading.Thread):
-
-    def __init__(self, name):
-        threading.Thread.__init__(self)
-        self.name = name
-
-    def run(self):
-        
-        with ThreadPoolExecutor(max_workers=min(4, (os.cpu_count() or 1) + 4)) as pool:
-            while True:
-                keys = users()
-                results = pool.map(gpt, map(lambda x : x.decode('utf-8'), keys))
-                for r in results:
-                    print(r)
-                time.sleep(1)
-
-
 if __name__ == "__main__":
-    LoopWorker('loop_worker').start()
     app.run(host="0.0.0.0", port=3456, debug=True)

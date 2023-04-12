@@ -1,0 +1,46 @@
+{
+    "header": {
+      "event_id": "088133827eccc7168abfa9bdc5c29252",
+      "token": "InaP4wRCjFSJwTIP9q1IsptLRAcGQV6O",
+      "create_time": "1681291008882",
+      "event_type": "im.message.receive_v1",
+      "tenant_key": "174f1d896abcd75d",
+      "app_id": "cli_a4bccc7c96bc9013"
+    },
+    "event": {
+      "message": {
+        "chat_id": "oc_82a20299b9741166bf404626a37f6bd8",
+        "chat_type": "group",
+        "content": "{\"text\":\"@_user_1 ?\"}",
+        "create_time": "1681291008624",
+        "mentions": [
+          {
+            "id": {
+              "open_id": "ou_3f08bfcc9b16f3146507814b9ea5245c",
+              "union_id": "on_9e562c5b8685104624183ba123ebfd3e",
+              "user_id": ""
+            },
+            "key": "@_user_1",
+            "name": "Her",
+            "tenant_key": "174f1d896abcd75d"
+          }
+        ],
+        "message_id": "om_80fb267c2a8b642a301429fac2a07447",
+        "message_type": "text",
+        "parent_id": "om_8d2d3700ca3d16ed95b262bae20abe56",
+        "root_id": "om_8d2d3700ca3d16ed95b262bae20abe56"
+      },
+      "sender": {
+        "sender_id": {
+          "open_id": "ou_f225a1c6ed112fa4950ace1e096d1aae",
+          "union_id": "on_7d82273dac8708a68bdfd08835fb4610",
+          "user_id": "a4e971d7"
+        },
+        "sender_type": "user",
+        "tenant_key": "174f1d896abcd75d"
+      }
+    }
+  }{
+    "text": "@_user_1 ?"
+  }
+  

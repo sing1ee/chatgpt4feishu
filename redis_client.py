@@ -6,7 +6,7 @@ role_user_key = "_user"
 
 __poll = redis.ConnectionPool(host='chat-redis', db=0, password=os.getenv('REDIS_PWD'), port=6379)
 __rclient = redis.Redis(connection_pool=__poll)
-print('redis init ', __rclient.get('REDIS_PWD'))
+print('redis init ', __rclient.get('__version__'))
 
 def __user_key(chat_id, user_id, chat_type):
     return '%s_%s_%s_%s' % (chat_type, chat_id, user_id, role_user_key)
