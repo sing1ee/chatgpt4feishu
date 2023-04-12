@@ -2,6 +2,7 @@
 import os
 import logging
 import requests
+import uuid
 
 APP_ID = os.getenv("APP_ID")
 APP_SECRET = os.getenv("APP_SECRET")
@@ -9,7 +10,7 @@ APP_SECRET = os.getenv("APP_SECRET")
 # const
 TENANT_ACCESS_TOKEN_URI = "/open-apis/auth/v3/tenant_access_token/internal"
 MESSAGE_URI = "/open-apis/im/v1/messages"
-REPLY_URI = "open-apis/im/v1/messages/%s/reply"
+REPLY_URI = "/open-apis/im/v1/messages/%s/reply"
 
 
 class MessageApiClient(object):
@@ -45,6 +46,25 @@ class MessageApiClient(object):
         resp = requests.post(url=url, headers=headers, json=req_body)
         print(resp)
         # MessageApiClient._check_error_response(resp)
+
+    def reply(self, message_id, msg_type, content):
+        self._authorize_tenant_access_token()
+        path = REPLY_URI % message_id
+        url = "{}{}".format(
+            self._lark_host, path
+        )
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + self.tenant_access_token,
+        }
+
+        req_body = {
+            "uuid": uuid.uuid1(),
+            "content": content,
+            "msg_type": msg_type,
+        }
+        resp = requests.post(url=url, headers=headers, json=req_body)
+        print(resp)
 
     def _authorize_tenant_access_token(self):
         # get tenant_access_token and set, implemented based on Feishu open api capability. doc link: https://open.feishu.cn/document/ukTMukTMukTM/ukDNz4SO0MjL5QzM/auth-v3/auth/tenant_access_token_internal

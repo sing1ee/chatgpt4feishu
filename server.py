@@ -98,18 +98,19 @@ def gpt(key):
             txt = json.loads(msg.event.message.content)['text']
             for m in msg.event.message.mentions:
                 txt = txt.replace(m.key, ' ')
-            print(txt)
-            # content = chat_completion(kwargs = {
+            message_api_client.reply(msg.event.message.message_id, 'text', json.dumps({'text':txt}))
+            # kwargs = {
             #     "model": "gpt-3.5-turbo",
             #     "messages": [
             #         {
             #         "role": "user",
-            #         "content": 
+            #         "content": txt
             #         }
             #     ],
-            #     "max_tokens": 200,
+            #     "max_tokens": 1000,
             #     "temperature": 0.0
-            # })
+            # }
+            # content = chat_completion(**kwargs)
 
             pass
     return key
