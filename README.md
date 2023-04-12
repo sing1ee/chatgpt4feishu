@@ -28,3 +28,9 @@ docker run --rm --env-file .env -v /your_code_folder:/home/app -p 6543:3456  -it
 ```shell
  https://your_domain.com/feishurobot
 ```
+
+### Gen requirements.txt
+```shell
+1. pip install pipreqs
+2. pipreqs --use-local ./
+```
