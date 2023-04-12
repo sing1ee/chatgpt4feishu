@@ -51,7 +51,6 @@ def message_receive_event_handler(req_data: MessageReceiveEvent):
     sender_id = req_data.event.sender.sender_id
     message = req_data.event.message
     msg = json.dumps(obj2dict(req_data))
-    print(msg)
     if message.message_type != "text":
         logging.warning("Other types of messages have not been processed yet")
         return jsonify()
@@ -90,11 +89,12 @@ def callback_event_handler():
 
 
 def gpt(key):
+    print('%s %s' % (key, threading.current_thread().name))
     if key.startswith('group'):
         # load the latest msg
         msg = dict2obj(json.loads(get_user_msg_by_key(key, 0, 1)[0]))
         if not is_replied(key, msg.event.message.message_id):
-            print(json.dumps(obj2dict(msg.event.message)))
+            # print(json.dumps(obj2dict(msg.event.message)))
             txt = json.loads(msg.event.message.content)['text']
             for m in msg.event.message.mentions:
                 txt = txt.replace(m.key, ' ')
