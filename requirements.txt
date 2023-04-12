@@ -1,1 +1,5 @@
-
+python-dotenv
+requests
+pycryptodome
+openai
+Flask
