@@ -99,7 +99,6 @@ def gpt(key):
             for m in msg.event.message.mentions:
                 txt = txt.replace(m.key, ' ')
             
-            
             kwargs = {
                 "model": "gpt-3.5-turbo",
                 "messages": [
@@ -115,7 +114,7 @@ def gpt(key):
             message_api_client.reply(msg.event.message.message_id, 'text', json.dumps({'text':content}))
             replied(key, msg.event.message.message_id)
             pass
-    return key
+    return '%s %s' % (key, threading.current_thread().name)
 
 class LoopWorker (threading.Thread):
 
