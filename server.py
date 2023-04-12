@@ -123,7 +123,8 @@ class LoopWorker (threading.Thread):
         self.name = name
 
     def run(self):
-        with ThreadPoolExecutor(max_workers=min(len(keys), (os.cpu_count() or 1) + 4)) as pool:
+        
+        with ThreadPoolExecutor(max_workers=min(4, (os.cpu_count() or 1) + 4)) as pool:
             while True:
                 keys = users()
                 results = pool.map(gpt, map(lambda x : x.decode('utf-8'), keys))
