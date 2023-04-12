@@ -59,7 +59,7 @@ class MessageApiClient(object):
         }
 
         req_body = {
-            "uuid": uuid.uuid1(),
+            "uuid": str(uuid.uuid1()),
             "content": content,
             "msg_type": msg_type,
         }
