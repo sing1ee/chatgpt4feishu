@@ -6,11 +6,16 @@ import json
 import os
 import logging
 import requests
+import time
 from api import MessageApiClient
 from event import MessageReceiveEvent, UrlVerificationEvent, MessageReadEvent, EventManager
 from flask import Flask, jsonify
-from redis_client import push_user_msg
+from openai_client import chat_completion
+from redis_client import push_user_msg, users, get_user_msg_by_key, replied, is_replied
 from utils import obj2dict
+
+from concurrent.futures import ThreadPoolExecutor
+import threading
 
 
 # load env parameters form file named .env
@@ -84,6 +89,43 @@ def callback_event_handler():
     return event_handler(event)
 
 
+def gpt(key):
+    if key.startwith('group'):
+        # load the latest msg
+        msg = json.loads(get_user_msg_by_key(key, 0, 1))
+        if not is_replied(key, msg.event.message.message_id):
+            print(json.dumps(msg.event.message))
+            # content = chat_completion(kwargs = {
+            #     "model": "gpt-3.5-turbo",
+            #     "messages": [
+            #         {
+            #         "role": "user",
+            #         "content": 
+            #         }
+            #     ],
+            #     "max_tokens": 200,
+            #     "temperature": 0.0
+            # })
+
+            pass
+    return key
+
+class LoopWorker (threading.Thread):
+
+    def __init__(self, name):
+        threading.Thread.__init__(self)
+        self.name = name
+
+    def run(self):
+        while True:
+            keys = users()
+            with ThreadPoolExecutor(max_workers=min(len(keys), (os.cpu_count() or 1) + 4)) as pool:
+                results = pool.map(gpt, keys)
+                for r in results:
+                    print(r)
+            time.sleep(1)
+
+
 if __name__ == "__main__":
-    # init()
+    LoopWorker('loop_worker').start()
     app.run(host="0.0.0.0", port=3456, debug=True)

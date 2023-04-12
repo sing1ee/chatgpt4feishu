@@ -23,5 +23,17 @@ def push_assistant_msg(chat_id, user_id, chat_type, msg):
 def get_user_msg(chat_id, user_id, chat_type, start, end):
     return __rclient.lrange(__user_key(chat_id, user_id, chat_type), start, end)
 
+def get_user_msg_by_key(key, start, end):
+    return __rclient.lrange(key, start, end)
+
 def get_assistant_msg(chat_id, user_id, chat_type, start, end):
     return __rclient.lrange(__assistant_key(chat_id, user_id, chat_type), start, end)
+
+def users():
+    return __rclient.keys('*_%s' % role_user_key)
+
+def replied(key, message_id):
+    __rclient.hset('%s_replied' % key, message_id, 1)
+
+def is_replied(key, message_id):
+    return __rclient.hget('%s_replied' % key, message_id) is not None
