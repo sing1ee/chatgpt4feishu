@@ -120,7 +120,7 @@ class LoopWorker (threading.Thread):
         while True:
             keys = users()
             with ThreadPoolExecutor(max_workers=min(len(keys), (os.cpu_count() or 1) + 4)) as pool:
-                results = pool.map(gpt, list(map(lambda x : x.decode('utf-8'), keys)))
+                results = pool.map(gpt, map(lambda x : x.decode('utf-8'), keys))
                 for r in results:
                     print(r)
             time.sleep(1)
