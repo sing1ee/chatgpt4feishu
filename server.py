@@ -58,7 +58,7 @@ def message_receive_event_handler(req_data: MessageReceiveEvent):
         # get open_id and text_content
     # ou_3f08bfcc9b16f3146507814b9ea5245c
     if message.chat_type == 'group':
-        if message.mentions:
+        if hasattr(message, 'mentions') and message.mentions:
             for m in message.mentions:
                 if m.id.open_id == 'ou_3f08bfcc9b16f3146507814b9ea5245c':
                     push_user_msg(message.chat_id, sender_id.open_id, message.chat_type, msg)
@@ -90,7 +90,7 @@ def callback_event_handler():
 
 
 def gpt(key):
-    if key.startwith('group'):
+    if key.startswith('group'):
         # load the latest msg
         msg = json.loads(get_user_msg_by_key(key, 0, 1))
         if not is_replied(key, msg.event.message.message_id):
