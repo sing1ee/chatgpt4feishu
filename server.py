@@ -51,10 +51,17 @@ def message_receive_event_handler(req_data: MessageReceiveEvent):
         logging.warning("Other types of messages have not been processed yet")
         return jsonify()
         # get open_id and text_content
-    push_user_msg(message.chat_id, sender_id.open_id, msg)
-    # echo text message
+    # ou_3f08bfcc9b16f3146507814b9ea5245c
     if message.chat_type == 'group':
-        message_api_client.send('chat_id', message.chat_id, 'text', json.dumps({'text':'echo'}))
+        if message.mentions:
+            for m in message.metions:
+                if m.id.open_id == 'ou_3f08bfcc9b16f3146507814b9ea5245c':
+                    push_user_msg(message.chat_id, sender_id.open_id, message.chat_type, msg)
+                    break
+    else:
+        push_user_msg(message.chat_id, sender_id.open_id, message.chat_type, msg)
+    # if message.chat_type == 'group':
+    #     message_api_client.send('chat_id', message.chat_id, 'text', json.dumps({'text':'echo'}))
     return jsonify()
 
 

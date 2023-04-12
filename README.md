@@ -14,7 +14,7 @@ docker network create cc
 ### Run
 ```shell
 
-docker run --rm --env-file .env -v /your_code_folder:/home/app -p 6543:3456 --network cc  -it feishu-robot server.py
+docker run --rm --env-file .env -v /data/workspace/src/chatgpt4feishu:/home/app -p 6543:3456 --network cc  -it feishu-robot server.py
 ```
 
 ### Nginx 
