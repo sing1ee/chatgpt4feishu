@@ -37,37 +37,49 @@ def gpt(key):
             pass
         return 2
     else:
+        print('p2p')
         size = 10
         messages = []
         user_msg_list = get_msg_by_key(key, 0, size)
         assistan_msg_key = key.replace(role_user_key, role_assistant_key)
         assistan_msg_list = get_msg_by_key(assistan_msg_key, 0, size)
         last_replied_at = last_reply_at(key)
+        print(last_replied_at)
         if not last_replied_at:
             last_replied_at = 0
         else:
-            last_replied_at = int(str(last_replied_at))
+            last_replied_at = int(last_replied_at.decode())
+        print('last_at', last_replied_at)
         merged_list = []
         max_at = 0
         chat_id = ''
+        if user_msg_list:
+            at = dict2obj(json.loads(user_msg_list[0])).header.create_time
+            print('check', at, last_replied_at)
+            if int(at) <= last_replied_at:
+                return
         for m in user_msg_list:
             user_msg = dict2obj(json.loads(m))
             chat_id = user_msg.event.message.chat_id
             send_at = int(user_msg.header.create_time)
             if send_at > max_at:
                 max_at = send_at
-            if send_at > last_replied_at:
-                merged_list.append((send_at, 'user', json.loads(user_msg.event.message.content)['text'], user_msg.event.message.message_id))
+            merged_list.append((send_at, 'user', json.loads(user_msg.event.message.content)['text'], user_msg.event.message.message_id))
+
+        if not merged_list:
+            return
         for m in assistan_msg_list:
             assistant_msg = dict2obj(json.loads(m))
-            if assistant_msg.at > last_replied_at:
-                merged_list.append((assistant_msg.at, 'assistant', assistant_msg.text, ''))
-        sorted(merged_list, key=lambda s: s[0])
+            # if assistant_msg.at > last_replied_at:
+            merged_list.append((int(assistant_msg.at), 'assistant', assistant_msg.text, ''))
+        merged_list = sorted(merged_list, key=lambda s: s[0])
         for m in merged_list:
-            messages.append({
+            data = {
                 'role': m[1],
                 'content': m[2]
-            })
+            }
+            print(json.dumps(data))
+            messages.append(data)
         if merged_list[-1][1] == 'assistant':
             reply_cursor(key, merged_list[-1][0])
             return
@@ -78,17 +90,18 @@ def gpt(key):
                 "temperature": 0.0
             }
         content = chat_completion(**kwargs)
+        print(assistan_msg_key, json.dumps({'at': int(round(time.time() * 1000)), 'text': content}), merged_list[-1][0])
         latest_msg = dict2obj(json.loads(get_msg_by_key(key, 0, 1)[0]))
         if int(latest_msg.header.create_time) > max_at:
             # new msg comes
             message_api_client.reply(merged_list[-1][3], 'text', json.dumps({'text':content}))
-            push_assistant_msg_by_key(assistan_msg_key, {'at': int(round(time.time() * 1000)), 'text': content})
-            reply_cursor(key, merged_list[-1][0])
+            push_assistant_msg_by_key(assistan_msg_key, json.dumps({'at': int(round(time.time() * 1000)), 'text': content}))
+            reply_cursor(key, str(merged_list[-1][0]))
         else:
             # no new msg
             message_api_client.send('chat_id', chat_id, 'text', json.dumps({'text':content}))
-            push_assistant_msg_by_key(assistan_msg_key, {'at': int(round(time.time() * 1000)), 'text': content})
-            reply_cursor(key, merged_list[-1][0])
+            push_assistant_msg_by_key(assistan_msg_key, json.dumps({'at': int(round(time.time() * 1000)), 'text': content}))
+            reply_cursor(key, str(merged_list[-1][0]))
         pass
     return 1
 

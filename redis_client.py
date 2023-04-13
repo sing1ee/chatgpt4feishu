@@ -40,7 +40,7 @@ def replied(key, message_id, ts=1):
 
 # get ts
 def replied_at(key, message_id):
-    __rclient.hget('%s_replied' % key, message_id)
+    return __rclient.hget('%s_replied' % key, message_id)
 
 def is_replied(key, message_id):
     return __rclient.hget('%s_replied' % key, message_id) is not None
