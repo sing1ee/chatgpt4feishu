@@ -17,11 +17,11 @@ if __name__ == '__main__':
         "messages": [
             {
             "role": "user",
-            "content": "上海是一座什么样的城市？"
+            "content": "上海是一座"
             }
         ],
-        "max_tokens": 200,
+        "max_tokens": 3500,
         "temperature": 0.0
     }
-    print(chat_completion(**kwargs))
+    print(chat_completion(timeout=1, **kwargs))
     pass

@@ -89,7 +89,25 @@ def gpt(key):
                 "max_tokens": 1000,
                 "temperature": 0.0
             }
-        content = chat_completion(**kwargs)
+        content = None
+        try_num = 3
+        while try_num > 0:
+            try:
+                content = chat_completion(timeout=1, **kwargs)
+            except:
+                messages = messages[:len(messages)/2]
+                kwargs = {
+                    "model": "gpt-3.5-turbo",
+                    "messages": messages,
+                    "max_tokens": 1000,
+                    "temperature": 0.0
+                }
+                pass
+        if not content:
+            message_api_client.send('chat_id', chat_id, 'text', json.dumps({'text':content}))
+            push_assistant_msg_by_key(assistan_msg_key, json.dumps({'at': int(round(time.time() * 1000)), 'text': '无法回答您的问题，可以试着问问别的。'}))
+            reply_cursor(key, str(merged_list[-1][0]))
+            return 0
         print(assistan_msg_key, json.dumps({'at': int(round(time.time() * 1000)), 'text': content}), merged_list[-1][0])
         latest_msg = dict2obj(json.loads(get_msg_by_key(key, 0, 1)[0]))
         if int(latest_msg.header.create_time) > max_at:
